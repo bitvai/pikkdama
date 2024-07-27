@@ -1,10 +1,10 @@
 ﻿@page "/"
 @inject IConfiguration configuration
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Pikk dáma pontszám</PageTitle>
 
   <div class="content" align="center">
-      <h1>Pikkdáma pontszám</h1>
+      <h1>Pikk dáma pontszám</h1>
       <div class="row justify-content-sm-center">
           <div class="col-sm-auto col-md-auto col-lg-auto">
               <RadzenCard>
@@ -34,9 +34,9 @@
           </div>
       </div>
   </div>
+  
 
-
-  <EventConsole @ref=@console class="mt-4" />
+@*  <EventConsole @ref=@console class="mt-4" /> *@
 
 @code {
     IEnumerable<int> values = new int[] { };
@@ -78,8 +78,6 @@
   {
       overall = negative.Sum() + 10 * utesek;
   }
-  
-
 }
 
 

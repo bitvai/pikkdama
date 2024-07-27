@@ -47,7 +47,7 @@
 
   protected override void OnInitialized()
   {
-
+      CalcPoints(values, utesek);
   }
 
   void OnUtesekSzama(int value, string name)
@@ -61,6 +61,7 @@
   {
       values = new int[]{};
       utesek = 1;
+      CalcPoints(values, utesek);
   }
   
   private void SelectedChanged()

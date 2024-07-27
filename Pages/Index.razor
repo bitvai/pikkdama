@@ -1,0 +1,133 @@
+﻿@page "/"
+@inject IConfiguration configuration
+
+<PageTitle>Index</PageTitle>
+
+  <div class="content" align="center">
+  <h1>Pikk dáma ütés számító</h1>
+  <div class="row justify-content-sm-center">
+    <div class="col-sm-auto col-md-auto col-lg-auto">
+        <RadzenCard>
+            <h4 class="mb-2" align="left">Hónap</h4>
+            <RadzenDropDown  align="left" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" @bind-Value=@selectedMonth Placeholder="Hónap" Data=@(workingDays.Select(c => c.MonthName)) Change=@(args => OnMonthChange((string)args, "Month selected"))>
+
+            </RadzenDropDown>
+            <h4 class="m3-4 mt-2" align="left">Munkanapok száma:@workingDaysInMonth</h4>
+            <h4 class="mb-3 mt-3" align="left">Szabadságos napok száma:</h4>
+            <RadzenNumeric align="left" TValue="int" Value=@holidayDays Min="0" Max=@maxHolidays Change=@(args => OnHolidayChange((int)args, "Holidays")) class="w-100" />
+            <RadzenButton class="mt-3" Click=@(args => OnClick("Success button ")) Text="Számolj" ButtonStyle="ButtonStyle.Success" />
+            <h4 class="mt-3 @hoVisible" align="left">Home office napok maximális száma:@possibleHomeofficeDays</h4>
+        </RadzenCard>
+    </div>
+  </div>
+  </div>
+
+
+<!--EventConsole @ref=@console class="mt-4" /-->
+
+@code {
+
+  List<WorkingDaysInMonth> workingDays = new List<WorkingDaysInMonth>{
+    new WorkingDaysInMonth("Január", 22),
+    new WorkingDaysInMonth("Február", 21),
+    new WorkingDaysInMonth("Március", 19),
+    new WorkingDaysInMonth("Április", 21),
+    new WorkingDaysInMonth("Május",21),
+    new WorkingDaysInMonth("Június",20),
+    new WorkingDaysInMonth("Július", 23),
+    new WorkingDaysInMonth("Augusztus",21),
+    new WorkingDaysInMonth("Szeptember",21),
+    new WorkingDaysInMonth("Október", 22),
+    new WorkingDaysInMonth("November",20),
+    new WorkingDaysInMonth("December", 20)};
+
+  string? selectedMonth;
+  int workingDaysInMonth = 0;
+  int maxHolidays = 0;
+  int possibleHomeofficeDays = 0;
+  int holidayDays = 0;
+  string hoVisible = "invisible";
+
+  EventConsole? console;
+
+  protected override void OnInitialized()
+  {
+      var current = DateTime.Now.Month;
+      selectedMonth = workingDays[current-1].MonthName;
+      workingDaysInMonth = workingDays[current-1].Days;
+      maxHolidays = workingDaysInMonth;
+  }
+
+  protected override void OnAfterRender(bool firstRender)
+  {
+    base.OnAfterRender(firstRender);
+  }
+
+
+  int CalculateHomeOfficeDays(int workDays, int holidays)
+  {
+    int num = (int) Math.Round((double) (workDays - holidays) / (double) workDays * 12.0);
+    if (num < 1)
+      num = 0;
+    else if (num > 12)
+      num = 12;
+    
+    return num;
+  }
+
+
+  void OnMonthChange(string value, string name)
+  {
+      workingDaysInMonth = GetWorkingDaysInMonth(value);
+      maxHolidays = workingDaysInMonth;
+      hoVisible = GetVisible(false);
+      holidayDays = 0;
+      possibleHomeofficeDays = 0;
+      console?.Log($"{name} value changed to {value}");
+  }
+
+
+  void OnHolidayChange(int value, string name)
+  {
+      holidayDays = value;
+      hoVisible = GetVisible(false);
+      console?.Log($"{name} value changed to {value}");
+  }
+
+  void OnClick(string value)
+  {
+    hoVisible = GetVisible(true);
+    possibleHomeofficeDays = CalculateHomeOfficeDays(workingDaysInMonth, holidayDays);
+
+  }
+  int GetWorkingDaysInMonth(string value)
+  {
+      var month = workingDays.FirstOrDefault(m => m.MonthName.Equals(value));
+      if (month == null) 
+      {
+        return 0;
+      }
+      return month.Days;
+  }
+  
+  string GetVisible(bool b)
+  {
+    if (b) return "visible";
+    else return "invisible";
+  }
+
+
+  class WorkingDaysInMonth
+  {
+    public WorkingDaysInMonth(string month, int days)
+    {
+      MonthName = month;
+      Days = days;
+    }
+
+    public string MonthName {get;}
+    public int Days {get;}
+  }
+}
+
+

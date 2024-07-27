@@ -4,31 +4,32 @@
 <PageTitle>Index</PageTitle>
 
   <div class="content" align="center">
-      <h1>Pikk dáma ütés számító</h1>
+      <h1>Pikkdáma pontszám</h1>
       <div class="row justify-content-sm-center">
           <div class="col-sm-auto col-md-auto col-lg-auto">
               <RadzenCard>
+                  <h4 class="mt-3" align="left">Összpontszám:@overall</h4>
                   <h4 class="mb-3 mt-3" align="left">Ütések száma:</h4>
                   <RadzenNumeric align="left" TValue="int" Value=@utesek Min="1" Max="13" Change=@(args => OnUtesekSzama((int)args, "Ütések")) class="w-100"/>
-                  <RadzenCheckBoxList @bind-Value=@values AllowSelectAll="true" SelectAllText="Select all items" TValue="int" Orientation="Orientation.Vertical" Change="Callback">
+                  <RadzenCheckBoxList @bind-Value=@values AllowSelectAll="true" SelectAllText="Select all items" TValue="int" Orientation="Orientation.Vertical" Change="SelectedChanged">
                       <Items>
-                          <RadzenCheckBoxListItem Text="Pikk Dáma" Value="-26" />
-                          <RadzenCheckBoxListItem Text="Kör Ász" Value="-14" />
-                          <RadzenCheckBoxListItem Text="Kör Király" Value="-13" />
-                          <RadzenCheckBoxListItem Text="Kör Dáma" Value="-12" />
-                          <RadzenCheckBoxListItem Text="Kör Bubi" Value="-11" />
-                          <RadzenCheckBoxListItem Text="Kör 10" Value="-10" />
-                          <RadzenCheckBoxListItem Text="Kör 9" Value="-9" />
-                          <RadzenCheckBoxListItem Text="Kör 8" Value="-8" />
-                          <RadzenCheckBoxListItem Text="Kör 7" Value="-7" />
-                          <RadzenCheckBoxListItem Text="Kör 6" Value="-6" />
-                          <RadzenCheckBoxListItem Text="Kör 5" Value="-5" />
-                          <RadzenCheckBoxListItem Text="Kör 4" Value="-4" />
-                          <RadzenCheckBoxListItem Text="Kör 3" Value="-3" />
-                          <RadzenCheckBoxListItem Text="Kör 2" Value="-2" />
+                          <RadzenCheckBoxListItem Text="Pikk Dáma" Value="-26"/>
+                          <RadzenCheckBoxListItem Text="Kör Ász" Value="-14"/>
+                          <RadzenCheckBoxListItem Text="Kör Király" Value="-13"/>
+                          <RadzenCheckBoxListItem Text="Kör Dáma" Value="-12"/>
+                          <RadzenCheckBoxListItem Text="Kör Bubi" Value="-11"/>
+                          <RadzenCheckBoxListItem Text="Kör 10" Value="-10"/>
+                          <RadzenCheckBoxListItem Text="Kör 9" Value="-9"/>
+                          <RadzenCheckBoxListItem Text="Kör 8" Value="-8"/>
+                          <RadzenCheckBoxListItem Text="Kör 7" Value="-7"/>
+                          <RadzenCheckBoxListItem Text="Kör 6" Value="-6"/>
+                          <RadzenCheckBoxListItem Text="Kör 5" Value="-5"/>
+                          <RadzenCheckBoxListItem Text="Kör 4" Value="-4"/>
+                          <RadzenCheckBoxListItem Text="Kör 3" Value="-3"/>
+                          <RadzenCheckBoxListItem Text="Kör 2" Value="-2"/>
                       </Items>
                   </RadzenCheckBoxList>
-                  <RadzenButton class="mt-3" Click=@(args => OnClick("Törlés button ")) Text="Törlés" ButtonStyle="ButtonStyle.Success" />
+                  <RadzenButton class="mt-3" Click=@(args => OnClear("Törlés button")) Text="Törlés" ButtonStyle="ButtonStyle.Success"/>
               </RadzenCard>
           </div>
       </div>
@@ -40,6 +41,7 @@
 @code {
     IEnumerable<int> values = new int[] { };
     int utesek = 1;
+    int overall = 0;
 
   EventConsole? console;
 
@@ -48,30 +50,35 @@
 
   }
 
-  protected override void OnAfterRender(bool firstRender)
-  {
-    base.OnAfterRender(firstRender);
-  }
-
-
   void OnUtesekSzama(int value, string name)
   {
       utesek = value;
-      console?.Log($"Ütések száma:{value}");
-  }
+      CalcPoints(values, utesek);
+      console?.Log($"Ütések száma:{value}, pontszam:{overall}");
+    }
 
-  void OnClick(string value)
+  void OnClear(string value)
   {
       values = new int[]{};
+      utesek = 1;
   }
   
-  private void Callback(IEnumerable<int> obj)
+  private void SelectedChanged()
   {
-      foreach (var i in obj)
-      {
-            console?.Log($"checkboxlist {i}");
-        }
+      foreach (var i in values)
+      { 
+          console?.Log($"{i}");
+      }
+      
+      CalcPoints(values, utesek);
+      console?.Log($"Pontszam:{overall}");
+    }
+
+  private void CalcPoints(IEnumerable<int> negative, int utesek)
+  {
+      overall = negative.Sum() + 10 * utesek;
   }
+  
 
 }
 
